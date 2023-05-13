@@ -1,5 +1,5 @@
 """
-Created on Mon May 8 19:15:03 2023
+Created on Sat May 15  10:28:33 2023
 
 @author: Rachel Kalusniak
 """
@@ -7,9 +7,8 @@ Created on Mon May 8 19:15:03 2023
 import numpy as np
 
 
-
 #Create a function to find the  step direction of a list
-def AOC1a(deapthfile):
+def AOC1b(deapthfile):
     """
     Use a list and check if the next value is an increase or decrease.
 
@@ -32,21 +31,25 @@ def AOC1a(deapthfile):
     #Convert the list of strings to integers
     seafloor_list = [int(i) for i in seafloor_list]
 
+    #seafloor_list = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
 
-    #Find the number of items in the seafloor list allowing for variability
+    # Find the number of items in the seafloor list allowing for variability
     length = len(seafloor_list)
 
-   #Initallize an secondary list with the previous value in the same position.
-        #The first value is zero becuase there is no previous value.
-    seafloor_list2 = [0]
+    seafloor_moving3_list = []
+    for i in range(0, length - 2):
+        seafloor_moving3_list.append(seafloor_list[i] + seafloor_list[i + 1] + seafloor_list[i + 2])
 
-    #Create the secondary list with the previous value in the same position.
-    for i in range(0, length - 1):
-        seafloor_list2.append(seafloor_list[i])
+    # Initialize a secondary list with the previous value in the same position.
+    # The first value is zero because there is no previous value.
+    seafloor_moving3_list2 = [0]
+
+    for i in range(0, len(seafloor_moving3_list) - 1):
+        seafloor_moving3_list2.append(seafloor_moving3_list[i])
 
     #Convert the list to arrays for easy subtraction.
-    array1 = np.array(seafloor_list)
-    array2 = np.array(seafloor_list2)
+    array1 = np.array(seafloor_moving3_list)
+    array2 = np.array(seafloor_moving3_list2)
 
     #Subtract the arrays
     diffnum_array = np.subtract(array1, array2)
@@ -65,10 +68,8 @@ def AOC1a(deapthfile):
         if x < 0:
             decreased += 1
 
-    #Return the number of the depth measurement increases
     return increased
 
 
-#Run the Python script above and print results
 if __name__ == '__main__':
-    print('The depth measurement increased {} times'.format(AOC1a('input.txt')))
+    print('The three-measurement sliding depth increased {} times'.format(AOC1b('input.txt')))
