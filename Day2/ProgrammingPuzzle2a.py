@@ -15,9 +15,6 @@ else:
 with open(data_file, 'r') as f:
     input = f.read().splitlines()
 
-#input_edit = []
-#for x in range(0, len(input)):
-
 input_edit = [input[x].split(" ", 1) for x in range(0, len(input))]
 
 direct = [i[0] for i in input_edit]
