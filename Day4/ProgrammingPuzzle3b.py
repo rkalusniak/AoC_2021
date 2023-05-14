@@ -1,5 +1,5 @@
 """
-Created: May 13 16:38:17 2023
+Created: May 13 22:49:17 2023
 
 by: Rachel Kalusniak
 """
@@ -7,7 +7,7 @@ import re
 import numpy as np
 
 #Allow to run with test or actual file
-test = True
+test = False
 if test:
     data_file = 'input_test.txt'
 else:
@@ -63,64 +63,49 @@ for i in range(0, num_cards):
         bingo_cards.append(np.array(bingo_rows[(i*5): (i*5)+5]))
 
 
-#Not we can start testing to see if the calls match the bingo cards
-#We are going to check when each set of lines (rows and columns)
+
+#We need to combine the rows and columns into 1 large list
+check_groups = []
+for i in range(0, len(bingo_cards)):
+    for x in bingo_rows[i*5:(i*5)+5]:
+        check_groups.append(x)
+    for y in bingo_columns[i*5:(i*5)+5]:
+        check_groups.append(y)
+
+#Now break the list into sub lists by card
+check_groups_bycard = []
+for i in range(0, len(bingo_cards)):
+    check_groups_bycard.append(check_groups[i*10:i*10+10])
 
 
-#First we need to initialize to an obviously large value, so we don't get an error if there is no match.
-    #Rows and columns are equal, so it doesn't matter which one we use.
-row_call_num = len(bingo_rows) * 1000
-col_call_num = len(bingo_rows) * 1000
-row = len(bingo_rows) * 1000
-column = len(bingo_rows) * 1000
-
-
-#Loop through the rows
+#Now we can start testing to see if the calls match the bingo cards
+#Loop through list by card and find the call number when each card wins
+    #Start with looping through the cards
     #We can start a call list 4 becuase we are not going to get a match if we call less than 5 numbers.
-    #We check until all the items in the call list are in bingo row j. Check_rows returns true.
+    #We check until all the items against our groups list. Check returns true.
     #Then we break the inner loop then we break the outer loop.
-    #We record the winning row number and call number for the final calulation.
-for i in range(4, len(call_list)):
-    for j in range(0, len(bingo_rows)):
-        check_rows = all(item in call_list[0:i] for item in bingo_rows[j])
-        if check_rows:
-            row = j
-            row_call_num = i
+    #We record the call number for the final calulation.
+matches = []
+for h in range(0, len(bingo_cards)):
+    for i in range(4, len(call_list)):
+        for j in range(10):
+            check = all(item in call_list[0:i] for item in check_groups_bycard[h][j])
+            if check:
+                matches.append(i)
+                break
+        if check:
             break
-    if check_rows:
-        break
-
-#Loop through columns with same method as rows.
-for i in range(4, len(call_list)):
-    for k in range(0, len(bingo_columns)):
-        check_columns = all(item in call_list[0:i] for item in bingo_columns[k])
-        if check_columns:
-            column = k
-            col_call_num = i
-            break
-    if check_columns:
-        break
 
 
-print(f'Call Numbers - rows: {row_call_num}, columns: {col_call_num}')
-
-
-#Now we need to find the smallest call number that matches.
-    #We need to put the values in list to pull the minimum value
+#Now we need to find the largest call number that matches.
 #Subtract 1 from the minimum because the list is 1 ahead of the last value
-matches = (row_call_num, col_call_num)
-min_call_num = matches[matches.index(min(matches))]
+max_call_num = matches[matches.index(max(matches))]
 
 #Turn the minimum index into the minimum value
-last_call_num = call_list[min_call_num - 1]
+last_call_num = call_list[max_call_num - 1]
 
 #Now we need to find which card matched.
-#We have to check all dimensions to see which one had the minimum call number
-    #The matching card uses zero indexing
-if min_call_num == row_call_num:
-    match_card = int((row + 1)/5)
-elif min_call_num == col_call_num:
-    match_card = int((column + 1)/5)
+match_card = matches.index(max(matches))
 
 
 #Now we need to sum the non-matched values on the matched card.
@@ -128,8 +113,8 @@ elif min_call_num == col_call_num:
     #This why matched card above needs to be zero indexing
 #We convert the matched card and called numbers to 1D arrays, so we can find the difference to sum
 match_card_1d = bingo_cards[match_card].flatten()
-final_call_array = np.array(call_list[0:min_call_num])
-
+final_call_array = np.array(call_list[0:max_call_num])
+print(call_list[0:max_call_num])
 uncalled_sum = np.setdiff1d(match_card_1d, final_call_array).sum()
 
 #The answer is the sum of the last called number and the unmatched numbers
@@ -138,3 +123,4 @@ answer = uncalled_sum * last_call_num
 #Print answers
 print(f'The last number called is {last_call_num}. The matching card is {match_card}.')
 print(f'The sum of uncalled number on that card is {uncalled_sum}. The answer is {answer}.')
+
