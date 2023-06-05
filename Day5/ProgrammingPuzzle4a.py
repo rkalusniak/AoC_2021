@@ -6,6 +6,8 @@ by: Rachel Kalusniak
 import numpy as np
 import pandas as pd
 
+
+
 # Allow to run with test or actual file
 test = False
 if test:
@@ -16,6 +18,7 @@ else:
 # Open txt file and numbers called (zero line) into list
 with open(data_file, 'r') as f:
     input = f.read().rstrip().splitlines()
+
 
 
 # Initalize lines and coord list
@@ -62,14 +65,30 @@ for i in range(0, len(cord_list)):
         line_length.append(0)
     #If diagonal line input line length as none
     elif x_match[i] + y_match[i] == 0:
-        line_length.append(None)
+        line_length.append(np.max(cord_list[i][:, 0]) - np.min(cord_list[i][:, 0]))
 
 
 
 def all_points(i, val_num, rep_num):
     """
     Finds all the points between two a starting and ending point
+
     Parameters
+    ----------
+    i: integer
+        index number for a list of paired points
+    val_num: integer
+        The position of the number that is changing
+            1 if  x's match
+            0 if y's match
+    rep_num: integer
+        The position of the number that is repeating
+            This  is the opposite of the val_num
+
+    Returns
+    -------
+    subarray : numpy array
+        Contains all points including the beginning and end
     """
 
     #Find min and max values for steping
@@ -88,6 +107,8 @@ def all_points(i, val_num, rep_num):
     subarray[:,rep_num] = repeat_points
     return subarray
 
+
+
 #Initalize list to hold results
 all_cord = []
 for i in range(0, len(cord_list)):
@@ -105,8 +126,10 @@ for i in range(0, len(cord_list)):
             all_cord.append(all_points(i, 0, 1))
 
 
+
 #Flatten the list into a single dataframe
 flat_all_cord = pd.DataFrame(np.concatenate(all_cord), columns = {'xval', 'yval'})
+
 
 
 #Initalize duplicate counter dataframe
@@ -118,6 +141,8 @@ duplicates['count_hits'] = flat_all_cord.pivot_table(index = ['xval', 'yval'], a
 duplicates.reset_index(inplace = True)
 #Create a list of just points with repeates
 dup_count = duplicates[duplicates['count_hits'] >= 2]
+
+
 
 #Print the results
 print(f'There are {len(dup_count)} points where 2 or more lines intersect.')
