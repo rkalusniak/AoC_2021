@@ -3,3 +3,6 @@
 
 #Temp Python Folders
 *.idea/
+
+#Solution Files
+*.puzzle*
